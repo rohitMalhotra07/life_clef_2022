@@ -4,4 +4,5 @@ checkpoints/
 .ipynb_checkpoints/
 *.zip
 GLC/
-*/__pycache__/*
+__pycache__/
+ *.pyc
