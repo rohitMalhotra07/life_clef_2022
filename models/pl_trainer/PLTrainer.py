@@ -99,7 +99,8 @@ class EnvVectorModelTrainer(pl.LightningModule):
         val_loss = self.criterion(outputs, y)
         
         # print(outputs.shape)
-        s_pred = predict_top_30_set(torch.exp(outputs).cpu())
+        # torch.exp(outputs)
+        s_pred = predict_top_30_set(outputs.cpu())
         # print(s_pred)
         l = s_pred.shape[0]
         self.val_preds[batch_idx:batch_idx+l] = s_pred
@@ -109,7 +110,7 @@ class EnvVectorModelTrainer(pl.LightningModule):
 
     def validation_epoch_end(self, outputs):
         # print(self.val_preds.dtype)
-        # print(self.val_preds)
+        # print(self.val_preds.astype(int))
         score_val = top_k_error_rate_from_sets(self.y_val, self.val_preds.astype(int))
         print("Top-30 error rate: {:.1%} Validation Set".format(score_val))
         
@@ -196,7 +197,8 @@ class ResNetBasedModelTrainer(pl.LightningModule):
         # self.train_preds[batch_idx:batch_idx+self.batch_size] = s_pred
         
         self.log("train/step/loss", loss)
-        return {'loss': loss}
+        # return {'loss': loss}
+        return loss
 
     def training_epoch_end(self, outputs):
         pass
@@ -214,10 +216,13 @@ class ResNetBasedModelTrainer(pl.LightningModule):
         val_loss = self.criterion(outputs, y)
         
         # print(outputs.shape)
-        s_pred = predict_top_30_set(torch.exp(outputs).cpu())
-        # print(s_pred)
+        # torch.exp(outputs)
+        s_pred = predict_top_30_set(outputs.cpu())
+        
         l = s_pred.shape[0]
-        self.val_preds[batch_idx:batch_idx+l] = s_pred
+        # print([(batch_idx*self.batch_size),(batch_idx*self.batch_size)+l])
+        # print(outputs, torch.exp(outputs))
+        self.val_preds[(batch_idx*self.batch_size):(batch_idx*self.batch_size)+l] = s_pred
         
         self.log("valid/step/val_loss", val_loss)
         return {'val_loss': val_loss}
